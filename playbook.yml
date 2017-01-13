@@ -1,0 +1,92 @@
+---
+# Ansible playbook
+#
+# @author Roy Rim
+
+- hosts: all
+  gather_facts: yes
+
+  tasks:
+
+    - name: apt cmake3 repo
+      become: yes
+      apt_repository:
+        repo: ppa:george-edison55/cmake-3.x
+
+    - name: apt java8 repo
+      become: yes
+      apt_repository:
+        repo: ppa:openjdk-r/ppa
+
+    - name: apt installs java dependencies
+      become: yes
+      apt:
+        name: libgtk2.0-0,libatk-wrapper-java-jni,libgif4,libpulse0,libgnome2-0,libgnomevfs2-0,libgconf2-4,fonts-dejavu-extra,ca-certificates-java,libnss3,libpcsclite1
+        state: latest
+
+    - name: apt install java
+      become: yes
+      apt:
+        name: openjdk-8-jdk,openjdk-8-jdk-headless,openjdk-8-jre,openjdk-8-jre-headless
+        state: latest
+
+    - name: apt installs
+      become: yes
+      apt:
+        name: git,build-essential,automake,autoconf,libtool,cmake,maven,python,python-dev,python-virtualenv,python-pip,node,npm
+        state: latest
+
+    - name: git mongodb c driver
+      git:
+        repo: https://github.com/mongodb/mongo-c-driver.git
+        dest: /home/vagrant/mongo-c-driver
+        clone: yes
+
+    - name: git mongodb cxx driver
+      git:
+        repo: https://github.com/mongodb/mongo-cxx-driver.git
+        dest: /home/vagrant/mongo-cxx-driver
+        clone: yes
+
+    - name: git mongodb java driver
+      git:
+        repo: https://github.com/mongodb/mongo-java-driver.git
+        dest: /home/vagrant/mongo-java-driver
+        clone: yes
+    
+    - name: git simple mongodb java maven starter project
+      git:
+        repo: https://github.com/mongoroy/mongodb-maven-starter.git
+        dest: /home/vagrant/mongodb-maven-starter
+        clone: yes
+    
+    - name: install mongodb m via npm
+      become: yes
+      npm:
+        name: m
+        global: yes
+
+    - name: create mongodb directory
+      file:
+        path: /home/vagrant/mongodb/bin
+        state: directory
+
+    - name: Adding M_PREFIX for mongodb m
+      lineinfile: 
+        dest: /home/vagrant/.bashrc 
+        line: 'export M_PREFIX=~/mongodb'
+        insertafter: 'EOF' 
+        state: present
+
+    - name: Adding M_PREFIX/bin to PATH
+      lineinfile: 
+        dest: /home/vagrant/.bashrc 
+        line: 'export PATH=$PATH:~/mongodb/bin'
+        insertafter: 'EOF' 
+        state: present
+
+    - name: Install mtools
+      become: yes
+      pip:
+        name: pymongo, numpy, matplotlib, mtools
+

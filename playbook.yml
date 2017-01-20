@@ -33,7 +33,7 @@
     - name: apt installs
       become: yes
       apt:
-        name: git,build-essential,automake,autoconf,libtool,cmake,maven,python,python-dev,python-virtualenv,python-pip,node,npm
+        name: git,build-essential,pkg-config,automake,autoconf,libtool,libssl-dev,libsasl2-dev,cmake,maven,python,python-dev,python-virtualenv,python-pip,node,npm,libfreetype6-dev,scons
         state: latest
 
     - name: git mongodb c driver
@@ -46,6 +46,12 @@
       git:
         repo: https://github.com/mongodb/mongo-cxx-driver.git
         dest: /home/vagrant/mongo-cxx-driver
+        clone: yes
+
+    - name: git mongo
+      git:
+        repo: https://github.com/mongodb/mongo.git
+        dest: /home/vagrant/mongo
         clone: yes
 
     - name: git mongodb java driver
@@ -85,8 +91,35 @@
         insertafter: 'EOF' 
         state: present
 
+    - name: Adding JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      lineinfile: 
+        dest: /home/vagrant/.bashrc 
+        line: 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64'
+        insertafter: 'EOF' 
+        state: present
+
+    - name: Install pymongo
+      become: yes
+      pip:
+        name: pymongo
+
+    - name: Install numpy
+      become: yes
+      pip:
+        name: numpy
+
+    - name: Install functools32
+      become: yes
+      pip:
+        name: functools32
+
+    - name: Install matplotlib
+      become: yes
+      pip:
+        name: matplotlib
+
     - name: Install mtools
       become: yes
       pip:
-        name: pymongo, numpy, matplotlib, mtools
+        name: mtools
 
